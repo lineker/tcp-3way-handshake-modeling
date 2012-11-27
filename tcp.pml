@@ -3,24 +3,35 @@
 
 mtype = {SYN, SYN_ACK, ACK, FIN_ACK, MSG_ACK};
 
-chan senderchan = [chansize] of {mtype,byte,byte}; /*sender uses this channel to receive message*/
-chan receiverchan = [chansize] of {mtype,byte,byte}; /*receiver uses this channel to receive message*/
-chan messagechan = [chansize] of {byte,byte}; /*{receiveruid, message}, channel used to transmit messages */
+chan senderchan = [chansize] of {mtype,int,int}; /*sender uses this channel to receive message*/
+chan receiverchan = [chansize] of {mtype,int,int}; /*receiver uses this channel to receive message*/
+chan messagechan = [chansize] of {int,int}; /*{receiveruid, message}, channel used to transmit messages */
+byte ready = 1
+byte ready2 = 1;
 
-active proctype Sender()
+active proctype Sender ()
 {
 	printf("sender \n");
-	byte	senderuid = 0,
+	int	senderuid = 0,
 			receiveruid,
 			message = 1,
 			temp;
 
 	/* TCP three way handshake start here*/
 	CLOSED: /* state */
+	L:	(ready == 1);/* wait for recevier channel to be ready */
+		ready = 0;
+		do/*flush sender chan*/
+		:: senderchan?_,_,_;
+		:: empty(senderchan) -> break;
+		od;
+		printf("--- sender flushed ---\n");
+ 	
 		senderuid = senderuid + 1; /*increment senderuid*/
-		printf("send SYN \n");
-		receiverchan!SYN,senderuid;/* send SYN */
+		
+		receiverchan!SYN,senderuid,0;/* send SYN */
 	SYN_SENT: /* state */
+		printf("sent SYN \n");
 		senderchan?SYN_ACK,receiveruid,temp;
 		printf("received SYN+ACK \n");
 	SYN_RCVD: /* state , received SYN+ACK */
@@ -76,25 +87,50 @@ active proctype Sender()
 		fi;
 	FIN_WAIT:
 		receiverchan!ACK,senderuid,receiveruid;
-		/*goto CLOSED;*/
+		printf("--- sender closed ---\n");
+		ready2 = 1; /*set ready so receiver can clean up*/
+		
+		goto CLOSED;
 }
+
+/*never {	 process main cannot remain at L forever 
+accept:	do
+	:: main@L
+	od
+}*/
+
+/*never  {     ![](p->X b) this LTL is not working yet :)
+T0_init:
+	if
+	:: ((receiverchan?[SYN])) -> goto accept_S0
+	:: (1) -> goto T0_init
+	fi;
+accept_S0:
+	if
+	:: !(Sender@SYN_SENT) -> goto accept_all
+	fi;
+accept_all:
+	skip
+} */
 
 active proctype Receiver()
 {
-	byte	receiveruid = 0,
+	int	receiveruid = 0,
 			senderuid,
 			message,
 			temp,
 			last_received = 0;
 
 	printf("receiver \n");
+
+	CLOSED:
+		ready2 = 0;
 	LISTEN:
-		receiverchan?SYN,senderuid; /*receives SYN*/
+		receiverchan?SYN,senderuid,temp; /*receives SYN*/
 		printf("received SYN \n");
 		receiveruid = receiveruid + 1; /*increment uid*/
-		printf("send SYN+ACK \n");
 		senderchan!SYN_ACK,receiveruid,senderuid+1; /*send back SYN+ACK*/
-		
+		printf("sent SYN+ACK \n");
 	SYN_RCVD:
 		receiverchan?ACK,senderuid,temp;
 		printf("received ACK \n");
@@ -145,10 +181,19 @@ active proctype Receiver()
 			printf("receiver timeout: did NOT receive LAST_ACK \n");
 		fi;
 	LAST_ACK:
-		/*goto LISTEN:*/
-
-		
-
-
+		printf("--- receiver closed ---\n");
+		(ready2 == 1); /*wait for sender to finalized*/
+		do /* flush message chan*/
+		:: messagechan?_,_;
+		:: empty(messagechan) -> break;
+		od;
+		do /* flush receiver chan*/
+		:: receiverchan?_,_,_;
+		:: empty(receiverchan) -> break;
+		od;
+		printf("--- receiver flushed ---\n");
+		ready = 1; /*set ready so sender can clean up*/ 
+		goto CLOSED;
 
 }
+
