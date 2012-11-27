@@ -2,6 +2,7 @@
 // Lineker Tomazeli (insert McGill ID here) and Etienne Perot (260377858)
 
 #define chansize 5    // Channel size
+#define connections 2 // Number of times to allow the sender to reconnect. Used to limit the search space when model checking.
 #define timeout true  // Allow timeout (true) or not (false)
 
 mtype = {SYN, SYN_ACK, ACK, FIN_ACK, MSG_ACK};
@@ -15,7 +16,7 @@ byte ready2 = 1;
 
 active proctype Sender()
 {
-	int senderuid = 0, receiveruid, message = 1, temp;
+	int senderuid = 0, receiveruid, message = 1, temp, totalconnections = 0;
 
 	// TCP three way handshake starts here
 
@@ -91,7 +92,13 @@ active proctype Sender()
 		receiverchan ! ACK, senderuid, receiveruid;
 		printf("[S] --- Sender closed ---\n");
 		ready2 = 1; // Set ready so receiver can clean up
-		goto CLOSED;
+		if
+		:: totalconnections < connections ->
+			totalconnections = totalconnections + 1;
+			goto CLOSED;
+		:: else ->
+			printf("[S] Sender reached max connections; process terminating.\n");
+		fi;
 }
 
 /*never {	 process main cannot remain at L forever 
@@ -116,7 +123,7 @@ accept_all:
 
 active proctype Receiver()
 {
-	int receiveruid = 0, senderuid, message, temp, last_received = 0;
+	int receiveruid = 0, senderuid, message, temp, last_received = 0, totalconnections = 0;
 
 	CLOSED:
 		ready2 = 0;
@@ -189,5 +196,11 @@ active proctype Receiver()
 		od;
 		printf("[R] --- Receiver flushed ---\n");
 		ready = 1; // set ready so that the sender can clean up
-		goto CLOSED;
+		if
+		:: totalconnections < connections ->
+			totalconnections = totalconnections + 1;
+			goto CLOSED;
+		:: else ->
+			printf("[R] Receiver reached max connections; process terminating.\n");
+		fi;
 }
