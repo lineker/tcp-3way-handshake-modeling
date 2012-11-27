@@ -35,7 +35,7 @@ active proctype Sender()
 		receiverchan ! SYN, senderuid, 0; // Send SYN
 
 	SYN_SENT:
-		printf("[S] sent SYN\n");
+		printf("[S] Sent SYN\n");
 		senderchan ? SYN_ACK, receiveruid, temp;
 		printf("[S] Received SYN+ACK\n");
 
@@ -71,7 +71,7 @@ active proctype Sender()
 		:: timeout -> // We didn't get response, so timeout
 			if
 			:: true -> // Try to resend the message
-				printf("[S] Timeout: trying to resend message %d\n",message);
+				printf("[S] Timeout: trying to resend message %d\n", message);
 				goto ESTABLISHED;
 			:: true -> // if we never get MSG_ACK we can decide to close the connection
 				printf("[S] Timeout: Giving up, closing connection\n");
@@ -136,7 +136,7 @@ active proctype Receiver()
 		printf("[R] Received SYN\n");
 		receiveruid = receiveruid + 1; // increment sequence number
 		senderchan ! SYN_ACK, receiveruid, senderuid + 1; // Send back SYN+ACK
-		printf("[R] sent SYN+ACK\n");
+		printf("[R] Sent SYN+ACK\n");
 
 	SYN_RCVD:
 		receiverchan ? ACK, senderuid, temp;
