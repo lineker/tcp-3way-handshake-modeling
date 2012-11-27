@@ -3,6 +3,7 @@
 
 #define chansize 5    // Channel size
 #define connections 2 // Number of times to allow the sender to reconnect. Used to limit the search space when model checking.
+#define maxmessages 5 // Maximum number of messages to send per connection. Used to limit the search space when model checking.
 #define timeout true  // Allow timeout (true) or not (false)
 
 mtype = {SYN, SYN_ACK, ACK, FIN_ACK, MSG_ACK};
@@ -16,7 +17,7 @@ byte ready2 = 1;
 
 active proctype Sender()
 {
-	int senderuid = 0, receiveruid, message = 1, temp, totalconnections = 0;
+	int senderuid = 0, receiveruid, message = 1, temp, totalconnections = 0, nummessages;
 
 	// TCP three way handshake starts here
 
@@ -24,6 +25,7 @@ active proctype Sender()
 	L:
 		(ready == 1); // Wait for receiver channel to be ready
 		ready = 0;
+		nummessages = 0; // We have sent 0 messages so far
 		do // Flush sender channel
 		:: senderchan ? _, _, _;
 		:: empty(senderchan) -> break;
@@ -51,13 +53,14 @@ active proctype Sender()
 
 	ESTABLISHED:
 		// Start sending messages
+		nummessages = nummessages + 1;
 		messagechan ! receiveruid, message;
-		printf("[S] Message %d sent\n", message);
+		printf("[S] Message %d sent (%d sent so far)\n", message, nummessages);
 		if
 		:: senderchan ? MSG_ACK, temp ->
 			printf("[S] Received MSG_ACK\n");
 			if
-			:: true -> // Maybe we want to send another message...
+			:: nummessages < maxmessages -> // Maybe we want to send another message...
 				message = message + 1;
 				printf("[S] Decided to send another message %d\n", message);
 				goto ESTABLISHED;
