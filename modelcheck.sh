@@ -4,7 +4,7 @@
 cd "`dirname "$0"`"
 
 # Remove possible leftover files
-rm -f pan.* tcp.model
+rm -f pan.* tcp.model tcp.pml.trail
 # Create pan.c file
 if ! spin -a tcp.pml; then
 	echo 'Failed to create pan.c file' >&2
