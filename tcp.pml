@@ -8,11 +8,11 @@ Lineker Tomazeli (insert McGill ID here) and Etienne Perot (260377858)
 #define maxmessages 5 /* Maximum number of messages to send per connection. Used to limit the search space when model checking. */
 #define timeout true  /* Allow timeout (true) or not (false) */
 
-/*tcp flags*/
+/* TCP flags */
 mtype = {SYN, SYN_ACK, ACK, FIN_ACK, MSG_ACK};
 
-/*states*/
-mtype = {CLOSED,SYN_SENT,SYN_RCVD,ESTABLISHED,FIN_WAIT_1,FIN_WAIT,LISTEN,CLOSE_WAIT,LAST_ACK}
+/* States */
+mtype = {CLOSED, SYN_SENT, SYN_RCVD, ESTABLISHED, FIN_WAIT_1, FIN_WAIT, LISTEN, CLOSE_WAIT, LAST_ACK};
 
 chan senderchan = [chansize] of {mtype, int, int};   /* Sender uses this channel to receive messages */
 chan receiverchan = [chansize] of {mtype, int, int}; /* Receiver uses this channel to receive messages */
@@ -36,14 +36,14 @@ active proctype Sender()
 		od;
 		printf("[S] --- Sender flushed ---\n");
 		senderuid = senderuid + 1;
-		atomic{
+		atomic {
 			receiverchan ! SYN, senderuid, 0; /* Send SYN */
 			senderState = SYN_SENT;
 		}
+
 	l_SYN_SENT:
-		
 		printf("[S] Sent SYN\n");
-		atomic{
+		atomic {
 			senderchan ? SYN_ACK, receiveruid, temp;
 			senderState = SYN_RCVD; /* State once we've received a SYN+ACK message */
 		}
@@ -59,10 +59,11 @@ active proctype Sender()
 		senderuid = temp;
 		receiveruid = receiveruid + 1;
 		printf("[S] Sending ACK\n");
-		atomic{
+		atomic {
 			receiverchan ! ACK, senderuid, receiveruid;
 			senderState = ESTABLISHED;
 		}
+
 	l_ESTABLISHED:
 		/* Start sending messages */
 		nummessages = nummessages + 1;
@@ -92,7 +93,7 @@ active proctype Sender()
 		fi;
 
 	l_CLOSE:
-		atomic{
+		atomic {
 			receiverchan ! FIN_ACK, senderuid, receiveruid;
 			senderState = FIN_WAIT_1;
 		}
@@ -107,10 +108,9 @@ active proctype Sender()
 		fi;
 
 	l_FIN_WAIT:
-		atomic{
+		atomic {
 			receiverchan ! ACK, senderuid, receiveruid;
 			senderState = CLOSED;
-		
 			printf("[S] --- Sender closed ---\n");
 			if
 			:: totalconnections < connections ->
@@ -154,7 +154,7 @@ active proctype Receiver()
 		receiverchan ? SYN, senderuid, temp; /* Wait for SYN */
 		printf("[R] Received SYN\n");
 		receiveruid = receiveruid + 1; /* increment sequence number */
-		atomic{
+		atomic {
 			senderchan ! SYN_ACK, receiveruid, senderuid + 1; /* Send back SYN+ACK */
 			printf("[R] Sent SYN+ACK\n");
 			receiverState = SYN_RCVD; /* set state */
@@ -169,7 +169,7 @@ active proctype Receiver()
 			goto l_CLOSE_WAIT;
 		:: else -> skip;
 		fi;
-		atomic{
+		atomic {
 			receiveruid = temp;
 			receiverState = ESTABLISHED;
 		}
@@ -205,8 +205,7 @@ active proctype Receiver()
 	l_CLOSE_WAIT:
 		senderchan ! FIN_ACK, receiveruid, senderuid;
 		printf("[R] Sent FIN_ACK to sender\n");
-		atomic
-		{
+		atomic {
 			if
 			:: receiverchan ? ACK, senderuid, receiveruid ->
 				printf("[R] Received the last ACK\n");
@@ -218,17 +217,16 @@ active proctype Receiver()
 
 	l_LAST_ACK:
 		printf("[R] --- Receiver closed ---\n");
-		(senderState == CLOSED); /*wait for sender to finalized*/
+		(senderState == CLOSED); /* Wait for sender to be finalized */
 		do /* Flush message channel */
 		:: messagechan ? _, _;
 		:: empty(messagechan) -> break;
 		od;
-		do /* flush receiver channel */
+		do /* Flush receiver channel */
 		:: receiverchan ? _, _, _;
 		:: empty(receiverchan) -> break;
 		od;
 		printf("[R] --- Receiver flushed ---\n");
-
 		if
 		:: totalconnections < connections ->
 			totalconnections = totalconnections + 1;
