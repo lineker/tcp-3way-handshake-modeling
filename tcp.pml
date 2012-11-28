@@ -230,10 +230,7 @@ active proctype Receiver()
 	l_LAST_ACK:
 		printf("[R] --- Receiver closed ---\n");
 		(senderState == CLOSED); /* Wait for sender to be finalized */
-		do /* Flush message channel */
-		:: messagechan ? _, _;
-		:: empty(messagechan) -> break;
-		od;
+
 		do /* Flush receiver channel */
 		:: receiverchan ? _, _, _;
 		:: empty(receiverchan) -> break;
