@@ -4,7 +4,7 @@ Lineker Tomazeli (insert McGill ID here) and Etienne Perot (260377858)
 */
 
 #define chansize 5    /* Channel size */
-#define connections 100000 /* Number of times to allow the sender to reconnect. Used to limit the search space when model checking.*/
+#define connections 4 /* Number of times to allow the sender to reconnect. Used to limit the search space when model checking.*/
 #define maxmessages 5 /* Maximum number of messages to send per connection. Used to limit the search space when model checking. */
 #define timeout true  /* Allow timeout (true) or not (false) */
 
@@ -16,7 +16,7 @@ mtype = {CLOSED, SYN_SENT, SYN_RCVD, ESTABLISHED, FIN_WAIT_1, FIN_WAIT, LISTEN, 
 
 chan senderchan = [chansize] of {mtype, int, int};   /* Sender uses this channel to receive messages */
 chan receiverchan = [chansize] of {mtype, int, int}; /* Receiver uses this channel to receive messages */
-chan messagechan = [chansize] of {int, int};         /* {recipient, message}, channel used to transmit messages. recipient designates which proctype the message is meant to receive the message. */
+chan messagechan = [chansize] of {int, int};         /* {message number, message content}, channel used to transmit messages. */
 
 byte senderState;
 byte receiverState;
@@ -66,31 +66,38 @@ active proctype Sender()
 
 	l_ESTABLISHED:
 		/* Start sending messages */
-		nummessages = nummessages + 1;
-		messagechan ! receiveruid, message;
-		printf("[S] Message %d sent (%d sent so far)\n", message, nummessages);
+		messagechan ! senderuid, message;
+		printf("[S] Sent message #%d with payload \"%d\" (%d messages sent so far)\n", senderuid, message, nummessages);
 		if
-		:: senderchan ? MSG_ACK, temp ->
-			printf("[S] Received MSG_ACK\n");
+		:: senderchan ? MSG_ACK, temp, 0 ->
 			if
-			:: nummessages < maxmessages -> /* Maybe we want to send another message... */
-				message = message + 1;
-				printf("[S] Decided to send another message %d\n", message);
-				goto l_ESTABLISHED;
-			:: true -> /* ... or maybe we don't */
-				printf("[S] Decided not to send another message, closing connection.\n");
-				goto l_CLOSE;
+			:: temp == senderuid ->
+				printf("[S] Received MSG_ACK about message #%d, which is the latest message we've sent, so it was successfully received.\n", temp);
+				senderuid = senderuid + 1;
+				nummessages = nummessages + 1;
+				if
+				:: nummessages < maxmessages -> /* Maybe we want to send another message... */
+					message = message + 1;
+					printf("[S] Decided to send another message.\n", message);
+				:: true -> /* ... or maybe we don't */
+					printf("[S] Decided not to send another message, closing connection.\n");
+					goto l_CLOSE;
+				fi;
+			:: temp < senderuid ->
+				printf("[S] Received MSG_ACK about message #%d, which is an old message. Retransmitting message.\n", temp);
+			:: true ->
+				printf("[S] Received MSG_ACK about message #%d, but pretending it got dropped by the network. Ignoring.\n", temp);
 			fi;
-		:: true -> /* We didn't get response, so timeout */
+		:: empty(senderchan) -> /* We didn't get response, so timeout */
 			if
 			:: true -> /* Try to resend the message */
-				printf("[S] Timeout: trying to resend message %d\n", message);
-				goto l_ESTABLISHED;
-			:: true -> /* if we never get MSG_ACK we can decide to close the connection */
+				printf("[S] Timeout: trying to resend message #%d\n", senderuid);
+			:: true -> /* If we never get MSG_ACK we can decide to close the connection */
 				printf("[S] Timeout: Giving up, closing connection\n");
 				goto l_CLOSE;
 			fi;
 		fi;
+		goto l_ESTABLISHED;
 
 	l_CLOSE:
 		atomic {
@@ -144,10 +151,11 @@ accept_all:
 
 active proctype Receiver()
 {
-	int receiveruid = 0, senderuid, message, temp, last_received = 0, totalconnections = 0;
+	int receiveruid = 0, senderuid, message, temp, last_received, totalconnections = 0;
 
 	l_CLOSED:
 		receiverState = CLOSED;
+		last_received = 0;
 
 	l_LISTEN:
 		receiverState = LISTEN;
@@ -157,7 +165,7 @@ active proctype Receiver()
 		atomic {
 			senderchan ! SYN_ACK, receiveruid, senderuid + 1; /* Send back SYN+ACK */
 			printf("[R] Sent SYN+ACK\n");
-			receiverState = SYN_RCVD; /* set state */
+			receiverState = SYN_RCVD; /* Set state */
 		}
 
 	l_SYN_RCVD:
@@ -176,19 +184,25 @@ active proctype Receiver()
 
 	l_ESTABLISHED:
 		do
-		:: messagechan ? receiveruid, message -> /* Receive a message */
-			printf("[R] Message received %d\n", message);
+		:: messagechan ? temp, message -> /* Receive a message */
+			printf("[R] Message #%d received with payload \"%d\"\n", temp, message);
 			if
-			:: message <= last_received ->
-				printf("[R] Message %d already received, so ignore. It was probably a retransmission.\n", message);
-			:: message > last_received -> /* Send ACK that message was received */
-				last_received = message;
-				senderchan ! MSG_ACK, message;
-				printf("[R] Sent MSG_ACK for message %d\n", message);
+			:: temp < last_received ->
+				printf("[R] Message #%d was already received (last = %d), so ignore. It was probably a retransmission.\n", message, last_received);
+			:: temp >= last_received -> /* Send ACK that message was received */
+				if
+				:: temp == last_received ->
+					printf("[R] Message #%d is the same as the one last received. Our acknowledgement probably got ignored. Acknowledging again.\n", temp);
+				:: temp > last_received ->
+					printf("[R] Message #%d is a new message. Acknowledging.\n", temp);
+					last_received = temp;
+				fi;
+				senderchan ! MSG_ACK, last_received, 0;
+				printf("[R] Sent MSG_ACK for message #%d\n", last_received);
 			:: true -> /* Possible timeout */
-				printf("[R] Receiver timeout, pretending we didn't see the message and waiting for retransmission.\n");
-				goto l_ESTABLISHED;
+				printf("[R] Receiver pretending we didn't see the message, waiting for retransmission.\n");
 			fi;
+			goto l_ESTABLISHED;
 		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->  /* HOW DO I ADD ATOMIC HERE? */
 			printf("[R] Received FIN_ACK from sender\n");
 			receiverState = CLOSE_WAIT; /* change state bc we received a FIN */
