@@ -107,12 +107,13 @@ active proctype Sender()
 		printf("[S] Sent FIN_ACK to receiver\n");
 
 	l_FIN_WAIT_1:
-		if
-		:: senderchan ? FIN_ACK, receiveruid, senderuid->
+		do
+		:: senderchan ? MSG_ACK, _, _ ->
+			printf("[S] Received a retransmitted MSG_ACK. Ignoring, because we are trying to close the connection here.\n");
+		:: senderchan ? FIN_ACK, receiveruid, senderuid ->
 			printf("[S] Received FIN_ACK from receiver\n");
-		:: true ->
-			printf("[S] Timeout: Did NOT receive FIN_ACK from receiver!\n");
-		fi;
+			goto l_FIN_WAIT;
+		od;
 
 	l_FIN_WAIT:
 		atomic {
@@ -203,8 +204,14 @@ active proctype Receiver()
 				printf("[R] Receiver pretending we didn't see the message, waiting for retransmission.\n");
 			fi;
 			goto l_ESTABLISHED;
-		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->  /* HOW DO I ADD ATOMIC HERE? */
-			printf("[R] Received FIN_ACK from sender\n");
+		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->
+			printf("[R] Received FIN_ACK from sender, clearing out leftover messages in message channel (if any)...\n");
+			do
+			:: messagechan ? temp, message ->
+				printf("[R] Received leftover message #%d from sender, with payload \"%d\"\n", temp, message);
+			:: empty(messagechan) ->
+				break;
+			od;
 			receiverState = CLOSE_WAIT; /* change state bc we received a FIN */
 			goto l_CLOSE_WAIT;
 		/*if we don't receive any other msg*/
@@ -216,15 +223,9 @@ active proctype Receiver()
 	l_CLOSE_WAIT:
 		senderchan ! FIN_ACK, receiveruid, senderuid;
 		printf("[R] Sent FIN_ACK to sender\n");
-		atomic {
-			if
-			:: receiverchan ? ACK, senderuid, receiveruid ->
-				printf("[R] Received the last ACK\n");
-			:: true ->
-				printf("[R] Receiver timeout: did NOT receive LAST_ACK\n");
-			fi;
-			receiverState = LAST_ACK;
-		}
+		receiverchan ? ACK, senderuid, receiveruid;
+		printf("[R] Received the last ACK\n");
+		receiverState = LAST_ACK;
 
 	l_LAST_ACK:
 		printf("[R] --- Receiver closed ---\n");
