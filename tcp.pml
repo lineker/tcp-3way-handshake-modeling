@@ -175,21 +175,18 @@ active proctype Receiver()
 		}
 
 	l_ESTABLISHED:
-		do 
+		do
 		:: messagechan ? receiveruid, message -> /* Receive a message */
 			printf("[R] Message received %d\n", message);
 			if
-			:: true ->
-				if
-				:: message <= last_received ->
-					printf("[R] Message %d already received, so ignore. It was probably a retransmission.\n", message);
-				:: else -> /* Send ack that message was received */
-					last_received = message;
-					senderchan ! MSG_ACK, message;
-					printf("[R] Sent MSG_ACK for message %d\n", message);
-				fi;
-			:: true -> /* possible timeout */
-				printf("[R] Receiver timeout, waiting for another message.\n");
+			:: message <= last_received ->
+				printf("[R] Message %d already received, so ignore. It was probably a retransmission.\n", message);
+			:: message > last_received -> /* Send ACK that message was received */
+				last_received = message;
+				senderchan ! MSG_ACK, message;
+				printf("[R] Sent MSG_ACK for message %d\n", message);
+			:: true -> /* Possible timeout */
+				printf("[R] Receiver timeout, pretending we didn't see the message and waiting for retransmission.\n");
 				goto l_ESTABLISHED;
 			fi;
 		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->  /* HOW DO I ADD ATOMIC HERE? */
