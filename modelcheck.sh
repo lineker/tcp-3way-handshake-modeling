@@ -6,8 +6,10 @@ cd "`dirname "$0"`"
 pmlFile="${1:-"tcp.pml"}"
 
 COMPILER=gcc
+MODELARGS='-a'
 if [ "$pmlFile" == "tcp.pml" ]; then
 	COMPILER='gcc -DSAFETY'
+	MODELARGS=''
 fi
 
 cd "`dirname "$pmlFile"`"
@@ -26,7 +28,7 @@ if ! $COMPILER pan.c -o "$pmlFile".model; then
 	exit 1
 fi
 # Run it
-./"$pmlFile".model
+./"$pmlFile".model $MODELARGS
 # Remove cruft
 rm -f pan.* "$pmlFile".model
 # If there's a trail file, show it
