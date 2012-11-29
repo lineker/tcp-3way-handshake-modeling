@@ -1,20 +1,16 @@
-/* receiver_states.pml - Check if the receiver moves from state to state properly */
+/* closed_listen.pml - Check if the receiver moves from state CLOSED to state LISTEN properly */
 
-#include "../tcp.pml"
+#include "../../tcp.pml"
 
-#define receiver_CLOSED receiverState == CLOSED
-#define receiver_LISTEN receiverState == LISTEN
-
-never  {    /* !(receiver_CLOSED -> (receiver_CLOSED U receiver_LISTEN)) */
-accept_init:
+never  {    /* ![](receiver_CLOSED -> (receiver_CLOSED U receiver_LISTEN)) */
 T0_init:
         if
-        :: (! ((receiver_LISTEN)) && (receiver_CLOSED)) -> goto accept_S3
+        :: (! ((receiver_LISTEN)) && (receiver_CLOSED)) -> goto accept_S4
+        :: (1) -> goto T0_init
         fi;
-accept_S3:
-T0_S3:
+accept_S4:
         if
-        :: (! ((receiver_LISTEN))) -> goto accept_S3
+        :: (! ((receiver_LISTEN))) -> goto accept_S4
         :: (! ((receiver_CLOSED)) && ! ((receiver_LISTEN))) -> goto accept_all
         fi;
 accept_all:
