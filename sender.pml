@@ -1,4 +1,4 @@
-// sender.pml - Sender process
+/* sender.pml - Sender process */
 
 active proctype Sender()
 {

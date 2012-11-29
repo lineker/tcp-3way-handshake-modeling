@@ -1,4 +1,4 @@
-// receiver.pml - Receiver process
+/* receiver.pml - Receiver process */
 
 active proctype Receiver()
 {
