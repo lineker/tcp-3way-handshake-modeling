@@ -1,11 +1,11 @@
 /* receiver.pml - Receiver process */
 
-// Receiver states
+/* Receiver states */
 #define receiver_CLOSED   receiverState == CLOSED
 #define receiver_LISTEN   receiverState == LISTEN
 #define receiver_SYN_RCVD receiverState == SYN_RCVD
 
-// Receiver input events
+/* Receiver input events */
 #define receiverchan_SYN receiverchan?[SYN]
 
 active proctype Receiver()
