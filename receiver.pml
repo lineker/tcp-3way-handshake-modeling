@@ -1,5 +1,13 @@
 /* receiver.pml - Receiver process */
 
+// Receiver states
+#define receiver_CLOSED   receiverState == CLOSED
+#define receiver_LISTEN   receiverState == LISTEN
+#define receiver_SYN_RCVD receiverState == SYN_RCVD
+
+// Receiver input events
+#define receiverchan_SYN receiverchan?[SYN]
+
 active proctype Receiver()
 {
 	int receiveruid = 0, senderuid, message, temp, last_received, totalconnections = 0;
@@ -10,10 +18,10 @@ active proctype Receiver()
 
 	l_LISTEN:
 		receiverState = LISTEN;
-		receiverchan ? SYN, senderuid, temp; /* Wait for SYN */
-		printf("[R] Received SYN\n");
-		receiveruid = receiveruid + 1; /* increment sequence number */
 		atomic {
+			receiverchan ? SYN, senderuid, temp; /* Wait for SYN */
+			printf("[R] Received SYN\n");
+			receiveruid = receiveruid + 1; /* increment sequence number */
 			senderchan ! SYN_ACK, receiveruid, senderuid + 1; /* Send back SYN+ACK */
 			printf("[R] Sent SYN+ACK\n");
 			receiverState = SYN_RCVD; /* Set state */
