@@ -205,13 +205,7 @@ active proctype Receiver()
 			fi;
 			goto l_ESTABLISHED;
 		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->
-			printf("[R] Received FIN_ACK from sender, clearing out leftover messages in message channel (if any)...\n");
-			do
-			:: messagechan ? temp, message ->
-				printf("[R] Received leftover message #%d from sender, with payload \"%d\"\n", temp, message);
-			:: empty(messagechan) ->
-				break;
-			od;
+			printf("[R] Received FIN_ACK from sender\n");
 			receiverState = CLOSE_WAIT; /* change state bc we received a FIN */
 			goto l_CLOSE_WAIT;
 		/*if we don't receive any other msg*/
@@ -221,6 +215,13 @@ active proctype Receiver()
 		od;
 
 	l_CLOSE_WAIT:
+		printf("clearing out leftover messages in message channel (if any)...\n");
+		do
+		:: messagechan ? temp, message ->
+			printf("[R] Received leftover message #%d from sender, with payload \"%d\"\n", temp, message);
+		:: empty(messagechan) ->
+			break;
+		od;
 		senderchan ! FIN_ACK, receiveruid, senderuid;
 		printf("[R] Sent FIN_ACK to sender\n");
 		receiverchan ? ACK, senderuid, receiveruid;
