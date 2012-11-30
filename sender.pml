@@ -115,22 +115,3 @@ active proctype Sender()
 		}
 	}
 }
-/*never {	 process main cannot remain at L forever 
-accept:	do
-	:: main@L
-	od
-}*/
-
-/*never  {     ![](p->X b) this LTL is not working yet :)
-T0_init:
-	if
-	:: ((receiverchan?[SYN])) -> goto accept_S0
-	:: (1) -> goto T0_init
-	fi;
-accept_S0:
-	if
-	:: !(Sender@SYN_SENT) -> goto accept_all
-	fi;
-accept_all:
-	skip
-} */
