@@ -25,11 +25,11 @@ active proctype Receiver()
 			receiveruid = receiveruid + 1; /* increment sequence number */
 			senderchan ! SYN_ACK, receiveruid, senderuid + 1; /* Send back SYN+ACK */
 			printf("[R] Sent SYN+ACK\n");
-			receiverState = SYN_RCVD; /* Set state */
 		}
 	}
 
 	l_SYN_RCVD: {
+		receiverState = SYN_RCVD;
 		receiverchan ? ACK, senderuid, temp;
 		printf("[R] Received ACK\n");
 		if
@@ -38,13 +38,11 @@ active proctype Receiver()
 			goto l_CLOSE_WAIT;
 		:: else -> skip;
 		fi;
-		atomic {
-			receiveruid = temp;
-			receiverState = ESTABLISHED;
-		}
+		receiveruid = temp;
 	}
 
 	l_ESTABLISHED: {
+		receiverState = ESTABLISHED;
 		do
 		:: messagechan ? temp, message -> /* Receive a message */
 			printf("[R] Message #%d received with payload \"%d\"\n", temp, message);
@@ -67,8 +65,7 @@ active proctype Receiver()
 			goto l_ESTABLISHED;
 		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->
 			printf("[R] Received FIN_ACK from sender\n");
-			receiverState = CLOSE_WAIT; /* change state bc we received a FIN */
-			goto l_CLOSE_WAIT;
+			goto l_CLOSE_WAIT;  /* change state bc we received a FIN */
 		/*if we don't receive any other msg*/
 		/*:: timeout->
 			printf("server sent CLOSE \n");
@@ -77,6 +74,7 @@ active proctype Receiver()
 	}
 
 	l_CLOSE_WAIT: {
+		receiverState = CLOSE_WAIT;
 		printf("clearing out leftover messages in message channel (if any)...\n");
 		do
 		:: messagechan ? temp, message ->
@@ -88,10 +86,10 @@ active proctype Receiver()
 		printf("[R] Sent FIN_ACK to sender\n");
 		receiverchan ? ACK, senderuid, receiveruid;
 		printf("[R] Received the last ACK\n");
-		receiverState = LAST_ACK;
 	}
 
 	l_LAST_ACK: {
+		receiverState = LAST_ACK;
 		printf("[R] --- Receiver closed ---\n");
 		(senderState == CLOSED); /* Wait for sender to be finalized */
 
