@@ -9,8 +9,9 @@
 #define receiver_LAST_ACK    receiverState == LAST_ACK
 
 /* Receiver input events */
-#define receiverchan_SYN receiverchan?[SYN]
-#define receiverchan_ACK receiverchan?[ACK]
+#define receiverchan_SYN     receiverchan?[SYN]
+#define receiverchan_ACK     receiverchan?[ACK]
+#define receiverchan_FIN_ACK receiverchan?[FIN_ACK]
 
 int receiver_totalconnections = 0;
 
