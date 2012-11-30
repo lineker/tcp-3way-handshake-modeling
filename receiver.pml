@@ -1,12 +1,15 @@
 /* receiver.pml - Receiver process */
 
 /* Receiver states */
-#define receiver_CLOSED   receiverState == CLOSED
-#define receiver_LISTEN   receiverState == LISTEN
-#define receiver_SYN_RCVD receiverState == SYN_RCVD
+#define receiver_CLOSED      receiverState == CLOSED
+#define receiver_LISTEN      receiverState == LISTEN
+#define receiver_SYN_RCVD    receiverState == SYN_RCVD
+#define receiver_ESTABLISHED receiverState == ESTABLISHED
+#define receiver_CLOSE_WAIT  receiverState == CLOSE_WAIT
 
 /* Receiver input events */
 #define receiverchan_SYN receiverchan?[SYN]
+#define receiverchan_ACK receiverchan?[ACK]
 
 active proctype Receiver()
 {
@@ -29,8 +32,10 @@ active proctype Receiver()
 	}
 
 	l_SYN_RCVD: {
-		receiverState = SYN_RCVD;
-		receiverchan ? ACK, senderuid, temp;
+		atomic {
+			receiverState = SYN_RCVD;
+			receiverchan ? ACK, senderuid, temp;
+		}
 		printf("[R] Received ACK\n");
 		if
 		:: temp != receiveruid + 1 ->
