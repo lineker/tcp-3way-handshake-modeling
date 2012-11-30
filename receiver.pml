@@ -12,9 +12,11 @@
 #define receiverchan_SYN receiverchan?[SYN]
 #define receiverchan_ACK receiverchan?[ACK]
 
+int receiver_totalconnections = 0;
+
 active proctype Receiver()
 {
-	int receiveruid = 0, senderuid, message, temp, last_received, totalconnections = 0;
+	int receiveruid = 0, senderuid, message, temp, last_received;
 
 	l_CLOSED: {
 		receiverState = CLOSED;
@@ -105,8 +107,8 @@ active proctype Receiver()
 		od;
 		printf("[R] --- Receiver flushed ---\n");
 		if
-		:: totalconnections < connections ->
-			totalconnections = totalconnections + 1;
+		:: receiver_totalconnections < connections ->
+			receiver_totalconnections = receiver_totalconnections + 1;
 			goto l_CLOSED;
 		:: else ->
 			printf("[R] Receiver reached max connections; process terminating.\n");
