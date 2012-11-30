@@ -73,11 +73,7 @@ active proctype Receiver()
 			goto l_ESTABLISHED;
 		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->
 			printf("[R] Received FIN_ACK from sender\n");
-			goto l_CLOSE_WAIT;  /* change state bc we received a FIN */
-		/*if we don't receive any other msg*/
-		/*:: timeout->
-			printf("server sent CLOSE \n");
-			goto CLOSE;*/
+			goto l_CLOSE_WAIT;  /* change state because we received a FIN */
 		od;
 	}
 
