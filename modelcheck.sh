@@ -4,6 +4,7 @@
 cd "`dirname "$0"`"
 
 pmlFile="${1:-"tcp.pml"}"
+shift
 
 COMPILER=gcc
 MODELARGS='-a'
@@ -33,7 +34,7 @@ fi
 rm -f pan.* "$pmlFile".model
 # If there's a trail file, show it
 if [ -f "$pmlFile".trail ]; then
-	spin -t "$pmlFile"
+	spin -t "$@" "$pmlFile"
 	echo 'End of trail file' >&2
 	exit 1
 fi
