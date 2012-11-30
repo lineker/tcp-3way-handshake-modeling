@@ -6,6 +6,7 @@
 #define receiver_SYN_RCVD    receiverState == SYN_RCVD
 #define receiver_ESTABLISHED receiverState == ESTABLISHED
 #define receiver_CLOSE_WAIT  receiverState == CLOSE_WAIT
+#define receiver_LAST_ACK    receiverState == LAST_ACK
 
 /* Receiver input events */
 #define receiverchan_SYN receiverchan?[SYN]
@@ -80,7 +81,7 @@ active proctype Receiver()
 
 	l_CLOSE_WAIT: {
 		receiverState = CLOSE_WAIT;
-		printf("clearing out leftover messages in message channel (if any)...\n");
+		printf("Clearing out leftover messages in message channel (if any)...\n");
 		do
 		:: messagechan ? temp, message ->
 			printf("[R] Received leftover message #%d from sender, with payload \"%d\"\n", temp, message);
