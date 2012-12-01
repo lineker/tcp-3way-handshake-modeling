@@ -20,4 +20,4 @@ modelCheck tcp.pml || exit 1
 
 while IFS= read -d $'\0' -r file; do
 	modelCheck "$file" || exit 1
-done < <(find assertions -name '*.pml' -type f -print0)
+done < <(find "${1:-"assertions"}" -name '*.pml' -type f -print0)
