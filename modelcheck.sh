@@ -8,7 +8,7 @@ shift
 
 COMPILER=gcc
 MODELARGS='-a'
-if [ "$pmlFile" == "tcp.pml" ]; then
+if ! grep 'never {' "$pmlFile" &> /dev/null; then
 	COMPILER='gcc -DSAFETY'
 	MODELARGS=''
 fi
