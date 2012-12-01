@@ -13,6 +13,11 @@
 #define receiverchan_ACK     receiverchan?[ACK]
 #define receiverchan_FIN_ACK receiverchan?[FIN_ACK]
 
+/* Receiver output events */
+#define senderchan_SYN_ACK   senderchan?[SYN_ACK]
+#define senderchan_MSG_ACK   senderchan?[MSG_ACK]
+#define senderchan_FIN_ACK   senderchan?[FIN_ACK]
+
 int receiver_totalconnections = 0;
 
 active proctype Receiver()
@@ -97,7 +102,6 @@ active proctype Receiver()
 		receiverState = LAST_ACK;
 		printf("[R] --- Receiver closed ---\n");
 		(senderState == CLOSED); /* Wait for sender to be finalized */
-
 		do /* Flush receiver channel */
 		:: receiverchan ? _, _, _;
 		:: empty(receiverchan) -> break;
