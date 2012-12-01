@@ -56,6 +56,8 @@ active proctype Sender()
 			:: temp == senderuid ->
 				printf("[S] Received MSG_ACK about message #%d, which is the latest message we've sent, so it was successfully received.\n", temp);
 				senderuid = senderuid + 1;
+				printf("[S] [Payload] Sender commits to payload \"%d\". Payload hash: %d -> %d\n", message, payloadHashSent, payloadHashSent * hashmod + message % hashmod);
+				payloadHashSent = payloadHashSent * hashmod + message % hashmod;
 				nummessages = nummessages + 1;
 				if
 				:: nummessages < maxmessages -> /* Maybe we want to send another message... */
@@ -71,13 +73,8 @@ active proctype Sender()
 				printf("[S] Received MSG_ACK about message #%d, but pretending it got dropped by the network. Ignoring.\n", temp);
 			fi;
 		:: empty(senderchan) -> /* We didn't get response, so timeout */
-			if
-			:: true -> /* Try to resend the message */
-				printf("[S] Timeout: trying to resend message #%d\n", senderuid);
-			:: true -> /* If we never get MSG_ACK we can decide to close the connection */
-				printf("[S] Timeout: Giving up, closing connection\n");
-				goto l_CLOSE;
-			fi;
+			/* Try to resend the message */
+			printf("[S] Timeout: trying to resend message #%d\n", senderuid);
 		fi;
 		goto l_ESTABLISHED;
 	}
@@ -114,4 +111,5 @@ active proctype Sender()
 			fi;
 		}
 	}
+	senderState = TERMINATED;
 }

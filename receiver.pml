@@ -69,6 +69,8 @@ active proctype Receiver()
 					printf("[R] Message #%d is the same as the one last received. Our acknowledgement probably got ignored. Acknowledging again.\n", temp);
 				:: temp > last_received ->
 					printf("[R] Message #%d is a new message. Acknowledging.\n", temp);
+					printf("[R] [Payload] Receiver commits to payload \"%d\". Payload hash: %d -> %d\n", message, payloadHashReceived, payloadHashReceived * hashmod + message % hashmod);
+					payloadHashReceived = payloadHashReceived * hashmod + message % hashmod;
 					last_received = temp;
 				fi;
 				senderchan ! MSG_ACK, last_received, 0;
@@ -101,7 +103,7 @@ active proctype Receiver()
 	l_LAST_ACK: {
 		receiverState = LAST_ACK;
 		printf("[R] --- Receiver closed ---\n");
-		(senderState == CLOSED); /* Wait for sender to be finalized */
+		(senderState == CLOSED || senderState == TERMINATED); /* Wait for sender to be finalized */
 		do /* Flush receiver channel */
 		:: receiverchan ? _, _, _;
 		:: empty(receiverchan) -> break;
@@ -115,4 +117,5 @@ active proctype Receiver()
 			printf("[R] Receiver reached max connections; process terminating.\n");
 		fi;
 	}
+	receiverState = TERMINATED;
 }

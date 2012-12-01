@@ -4,20 +4,23 @@ Lineker Tomazeli (insert McGill ID here) and Etienne Perot (260377858)
 */
 
 #define chansize 5    /* Channel size */
-#define connections 4 /* Number of times to allow the sender to reconnect. Used to limit the search space when model checking.*/
+#define connections 2 /* Number of times to allow the sender to reconnect. Used to limit the search space when model checking.*/
 #define maxmessages 5 /* Maximum number of messages to send per connection. Used to limit the search space when model checking. */
 #define timeout true  /* Allow timeout (true) or not (false) */
+#define hashmod 137   /* Constant used in hashing the payload sequence */
 
 /* TCP flags */
 mtype = {SYN, SYN_ACK, ACK, FIN_ACK, MSG_ACK};
 
 /* States */
-mtype = {CLOSED, SYN_SENT, SYN_RCVD, ESTABLISHED, FIN_WAIT_1, FIN_WAIT, LISTEN, CLOSE_WAIT, LAST_ACK};
+mtype = {CLOSED, SYN_SENT, SYN_RCVD, ESTABLISHED, FIN_WAIT_1, FIN_WAIT, LISTEN, CLOSE_WAIT, LAST_ACK, TERMINATED};
 
 chan senderchan = [chansize] of {mtype, int, int};   /* Sender uses this channel to receive messages */
 chan receiverchan = [chansize] of {mtype, int, int}; /* Receiver uses this channel to receive messages */
 chan messagechan = [chansize] of {int, int};         /* {message number, message content}, channel used to transmit messages. */
 
+int payloadHashSent = 0;
+int payloadHashReceived = 0;
 byte senderState;
 byte receiverState;
 
