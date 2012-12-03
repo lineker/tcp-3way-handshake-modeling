@@ -13,13 +13,13 @@ mutantCheck() {
 		returnCode="$?"
 		if [ "$returnCode" -eq 1 ]; then
 			echo "[ OK ] Assertion $file caught mutant $1"
-			rm -f "$tempFile"
+			rm -f "$tempFile" "$tempFile.trail"
 			return 0
 		elif [ ! "$returnCode" -eq 0 ]; then
 			echo "         > [WARN] Assertion $file failed to compile when checking for mutant $1"
 		fi
 	done < <(find assertions -name '*.pml' -type f -print0)
-	rm -f "$tempFile"
+	rm -f "$tempFile" "$tempFile.trail"
 	echo "[FAIL] Mutant $1 wasn't caught by any assertion."
 	return 1
 }
