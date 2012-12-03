@@ -1,5 +1,13 @@
 /* sender.pml - Sender process */
 
+/* Sender states */
+#define sender_CLOSED      receiverState == CLOSED
+#define sender_SYN_SENT    receiverState == SYN_SENT
+#define sender_SYN_RCVD    receiverState == SYN_RCVD
+#define sender_ESTABLISHED receiverState == ESTABLISHED
+#define sender_FIN_WAIT_1  receiverState == FIN_WAIT_1
+#define sender_TERMINATED  receiverState == TERMINATED
+
 active proctype Sender()
 {
 	int senderuid = 0, receiveruid, message = 1, temp, totalconnections = 0, nummessages;
