@@ -29,7 +29,9 @@ active proctype Sender()
 			senderState = SYN_SENT;
 		}
 	}
-
+#ifdef MUTANT_SENDER_ESTABLISHED_BEFORE_SYN_ACK
+		MUTANT_SENDER_ESTABLISHED_BEFORE_SYN_ACK
+#endif
 	l_SYN_SENT: {
 		printf("[S] Sent SYN\n");
 		atomic {
@@ -40,10 +42,9 @@ active proctype Sender()
 	}
 
 	l_SYN_RCVD: { /* State once we've received a SYN+ACK message */
-		/*#ifdef MUTANT_WRONT_SENDERUID
-			MUTANT_WRONT_SENDERUID
-		#endif*/
-		assert(temp == senderuid + 1); /* Check if the sequence number matches */
+#ifdef MUTANT_SENDER_WRONT_SENDERUID
+		MUTANT_SENDER_WRONT_SENDERUID
+#endif
 		if 
 		:: temp != senderuid + 1 ->
 			printf("[S] senderuid sent by receiver doesn't match the expected value! Resetting state.\n");
@@ -52,6 +53,9 @@ active proctype Sender()
 		fi;
 		senderuid = temp;
 		receiveruid = receiveruid + 1;
+#ifdef MUTANT_SENDER_WRONT_RECEIVERUID
+		MUTANT_SENDER_WRONT_RECEIVERUID
+#endif
 		printf("[S] Sending ACK\n");
 		atomic {
 			receiverchan ! ACK, senderuid, receiveruid;
@@ -60,6 +64,9 @@ active proctype Sender()
 	}
 
 	l_ESTABLISHED: {
+#ifdef MUTANT_SENDER_SET_WRONG_STATE
+		MUTANT_SENDER_SET_WRONG_STATE
+#endif
 		/* Start sending messages */
 		messagechan ! senderuid, message;
 		printf("[S] Sent message #%d with payload \"%d\" (%d messages sent so far)\n", senderuid, message, nummessages);
