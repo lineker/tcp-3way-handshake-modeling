@@ -116,7 +116,6 @@ active proctype Receiver()
 			receiverState = LAST_ACK;
 		#endif
 		printf("[R] --- Receiver closed ---\n");
-		(senderState == CLOSED || senderState == TERMINATED); /* Wait for sender to be finalized */
 		do /* Flush receiver channel */
 		:: receiverchan ? _, _, _;
 		:: empty(receiverchan) -> break;
