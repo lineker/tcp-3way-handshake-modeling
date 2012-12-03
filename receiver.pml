@@ -69,6 +69,7 @@ active proctype Receiver()
 			if
 			#ifdef MUTANT_RECEIVER_ACKNOWLEDGE_ALL_MESSAGES
 				:: true ->
+					MUTANT_RECEIVER_ACKNOWLEDGE_ALL_MESSAGES
 			#else
 				:: true -> /* Possible timeout */
 					printf("[R] Receiver pretending we didn't see the message, waiting for retransmission.\n");
