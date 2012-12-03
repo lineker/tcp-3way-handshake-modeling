@@ -17,7 +17,9 @@ cd "`dirname "$pmlFile"`"
 pmlFile="`basename "$pmlFile"`"
 
 # Remove possible leftover files
-rm -f pan.* "$pmlFile".model "$pmlFile".trail
+trailFile1="$pmlFile".trail
+trailFile2=$(dirname "$pmlFile")/_$(basename "$pmlFile").trail
+rm -f pan.* "$pmlFile".model "$trailFile1" "$trailFile2"
 # Create pan.c file
 if ! spin -a "$pmlFile"; then
 	echo 'Failed to create pan.c file' >&2
@@ -33,7 +35,7 @@ fi
 # Remove cruft
 rm -f pan.* "$pmlFile".model
 # If there's a trail file, show it
-if [ -f "$pmlFile".trail ]; then
+if [ -f "$trailFile1" -o -f "$trailFile2" ]; then
 	spin -t "$@" "$pmlFile"
 	echo 'End of trail file' >&2
 	exit 1
