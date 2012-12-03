@@ -54,7 +54,7 @@
       <h>70</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
---/SYN</panel_attributes>
+true/SYN</panel_attributes>
     <additional_attributes>140;50;30;50</additional_attributes>
   </element>
   <element>
@@ -71,14 +71,14 @@
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>260</x>
+      <x>250</x>
       <y>190</y>
-      <w>110</w>
+      <w>124</w>
       <h>170</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 SYN_ACK</panel_attributes>
-    <additional_attributes>60;150;60;30</additional_attributes>
+    <additional_attributes>70;150;70;30</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.custom.State</type>
@@ -94,33 +94,33 @@ SYN_ACK</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>260</x>
+      <x>240</x>
       <y>350</y>
-      <w>110</w>
+      <w>152</w>
       <h>150</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
---/ACK</panel_attributes>
-    <additional_attributes>60;130;60;30</additional_attributes>
+true/SYN_ACK</panel_attributes>
+    <additional_attributes>80;130;80;30</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>20</x>
+      <x>50</x>
       <y>190</y>
-      <w>270</w>
+      <w>240</w>
       <h>190</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-  invalid senderuid returned</panel_attributes>
-    <additional_attributes>120;30;120;170;250;170</additional_attributes>
+      timeout</panel_attributes>
+    <additional_attributes>60;30;60;170;220;170</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>110</x>
       <y>470</y>
-      <w>198</w>
+      <w>186</w>
       <h>124</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
@@ -177,21 +177,21 @@ FIN_ACK/ACK</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>0</x>
+      <x>10</x>
       <y>0</y>
-      <w>190</w>
+      <w>180</w>
       <h>200</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 Max Connection</panel_attributes>
-    <additional_attributes>170;50;90;50;90;180</additional_attributes>
+    <additional_attributes>160;50;80;50;80;180</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
       <x>290</x>
       <y>470</y>
-      <w>166</w>
+      <w>162</w>
       <h>124</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
