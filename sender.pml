@@ -40,7 +40,8 @@ active proctype Sender()
 	}
 
 	l_SYN_RCVD: { /* State once we've received a SYN+ACK message */
-		if /* Check if the sequence number matches */
+		assert(temp == senderuid + 1); /* Check if the sequence number matches */
+		if 
 		:: temp != senderuid + 1 ->
 			printf("[S] senderuid sent by receiver doesn't match the expected value! Resetting state.\n");
 			goto l_CLOSE;
