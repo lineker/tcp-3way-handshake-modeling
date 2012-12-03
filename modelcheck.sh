@@ -21,12 +21,12 @@ rm -f pan.* "$pmlFile".model "$pmlFile".trail
 # Create pan.c file
 if ! spin -a "$pmlFile"; then
 	echo 'Failed to create pan.c file' >&2
-	exit 1
+	exit 2
 fi
 # Compile it
 if ! $COMPILER pan.c -o "$pmlFile".model; then
 	echo 'Failed to compile pan.c file' >&2
-	exit 1
+	exit 3
 fi
 # Run it
 ./"$pmlFile".model $MODELARGS
