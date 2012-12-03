@@ -1,6 +1,7 @@
 /* sender.pml - Sender process */
 
 /* Sender states */
+#define sender_zero        senderState == 0
 #define sender_CLOSED      senderState == CLOSED
 #define sender_SYN_SENT    senderState == SYN_SENT
 #define sender_SYN_RCVD    senderState == SYN_RCVD

@@ -2,10 +2,10 @@
 
 #include "../../tcp.pml"
 
-never  {    /* ![](receiver_CLOSED -> (sender_CLOSED || sender_SYN_SENT)) */
+never  {    /* ![](receiver_CLOSED -> (sender_CLOSED || sender_SYN_SENT || sender_zero)) */
 T0_init:
         if
-        :: (! ((sender_CLOSED || sender_SYN_SENT)) && (receiver_CLOSED)) -> goto accept_all
+        :: (! ((sender_CLOSED || sender_SYN_SENT || sender_zero)) && (receiver_CLOSED)) -> goto accept_all
         :: (1) -> goto T0_init
         fi;
 accept_all:
