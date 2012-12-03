@@ -34,6 +34,9 @@ active proctype Receiver()
 		atomic {
 			receiverchan ? SYN, senderuid, temp; /* Wait for SYN */
 			printf("[R] Received SYN\n");
+			#ifdef MUTANT_RECEIVER_SEND_INVALID_MSG_ACK
+				MUTANT_RECEIVER_SEND_INVALID_MSG_ACK
+			#endif
 			receiveruid = receiveruid + 1; /* increment sequence number */
 			senderchan ! SYN_ACK, receiveruid, senderuid + 1; /* Send back SYN+ACK */
 			printf("[R] Sent SYN+ACK\n");
