@@ -1,16 +1,16 @@
+* received_synack_to_synrcvd.pml - Check if the sender moves to state SYN_RCVD when received SYN_ACK  */
+
 #include "../../tcp.pml"
 
-/* receiverchan?[SYN] -> senderState == SYN_SENT */
-
-never  {    /* ![](p->X b) */
+never  {    /* ![](senderchan_SYN_ACK -> sender_SYN_RCVD) */
 T0_init:
 	if
-	:: (SENDER_RECEIVED_SYNACK) -> goto accept_S0
+	:: (senderchan_SYN_ACK) -> goto accept_S0
 	:: (1) -> goto T0_init
 	fi;
 accept_S0:
 	if
-	:: (! SENDER_AT_SYNRCVD) -> goto accept_all
+	:: (! sender_SYN_RCVD) -> goto accept_all
 	fi;
 accept_all:
 	skip
