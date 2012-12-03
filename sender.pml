@@ -40,6 +40,9 @@ active proctype Sender()
 	}
 
 	l_SYN_RCVD: { /* State once we've received a SYN+ACK message */
+		/*#ifdef MUTANT_WRONT_SENDERUID
+			MUTANT_WRONT_SENDERUID
+		#endif*/
 		assert(temp == senderuid + 1); /* Check if the sequence number matches */
 		if 
 		:: temp != senderuid + 1 ->
