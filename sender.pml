@@ -42,8 +42,8 @@ active proctype Sender()
 	}
 
 	l_SYN_RCVD: { /* State once we've received a SYN+ACK message */
-#ifdef MUTANT_SENDER_WRONT_SENDERUID
-		MUTANT_SENDER_WRONT_SENDERUID
+#ifdef MUTANT_SENDER_WRONG_SENDERUID
+		MUTANT_SENDER_WRONG_SENDERUID
 #endif
 		if 
 		:: temp != senderuid + 1 ->
@@ -53,8 +53,8 @@ active proctype Sender()
 		fi;
 		senderuid = temp;
 		receiveruid = receiveruid + 1;
-#ifdef MUTANT_SENDER_WRONT_RECEIVERUID
-		MUTANT_SENDER_WRONT_RECEIVERUID
+#ifdef MUTANT_SENDER_WRONG_RECEIVERUID
+		MUTANT_SENDER_WRONG_RECEIVERUID
 #endif
 		printf("[S] Sending SYN+ACK\n");
 		atomic {
