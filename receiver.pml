@@ -110,7 +110,11 @@ active proctype Receiver()
 	}
 
 	l_LAST_ACK: {
-		receiverState = LAST_ACK;
+		#ifdef MUTANT_RECEIVER_SET_WRONG_STATE
+			MUTANT_RECEIVER_SET_WRONG_STATE
+		#else
+			receiverState = LAST_ACK;
+		#endif
 		printf("[R] --- Receiver closed ---\n");
 		(senderState == CLOSED || senderState == TERMINATED); /* Wait for sender to be finalized */
 		do /* Flush receiver channel */
