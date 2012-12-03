@@ -101,7 +101,7 @@ active proctype Receiver()
 
 	l_CLOSE_WAIT: {
 		receiverState = CLOSE_WAIT;
-		printf("Clearing out leftover messages in message channel (if any)...\n");
+		printf("[R] Clearing out leftover messages in message channel (if any)...\n");
 		do
 		:: messagechan ? temp, message ->
 			printf("[R] Received leftover message #%d from sender, with payload \"%d\"\n", temp, message);
