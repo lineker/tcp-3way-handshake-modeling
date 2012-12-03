@@ -67,31 +67,30 @@ active proctype Receiver()
 			#endif
 			printf("[R] Message #%d received with payload \"%d\"\n", temp, message);
 			if
-			#ifdef MUTANT_RECEIVER_ACKNOWLEDGE_ALL_MESSAGES
-				:: true ->
-					MUTANT_RECEIVER_ACKNOWLEDGE_ALL_MESSAGES
-			#else
-				:: true -> /* Possible timeout */
-					printf("[R] Receiver pretending we didn't see the message, waiting for retransmission.\n");
-				:: temp < last_received ->
-					printf("[R] Message #%d was already received (last = %d), so ignore. It was probably a retransmission.\n", message, last_received);
-				:: temp >= last_received -> /* Send ACK that message was received */
-			#endif
-					if
-					:: temp == last_received ->
-						printf("[R] Message #%d is the same as the one last received. Our acknowledgement probably got ignored. Acknowledging again.\n", temp);
-					:: temp > last_received ->
-						printf("[R] Message #%d is a new message. Acknowledging.\n", temp);
-						printf("[R] [Payload] Receiver commits to payload \"%d\". Payload hash: %d -> %d\n", message, payloadHashReceived, payloadHashReceived * hashmod + message % hashmod);
-						payloadHashReceived = payloadHashReceived * hashmod + message % hashmod;
-						last_received = temp;
-					fi;
-					senderchan ! MSG_ACK, last_received, 0;
-					printf("[R] Sent MSG_ACK for message #%d\n", last_received);
-				/* MUTANT_RECEIVER_ACKNOWLEDGE_ALL_MESSAGES block end */
+			:: temp < last_received ->
+				printf("[R] Message #%d was already received (last = %d), so ignore. It was probably a retransmission.\n", message, last_received);
+			:: temp >= last_received -> /* Send ACK that message was received */
+				if
+				:: temp == last_received ->
+					printf("[R] Message #%d is the same as the one last received. Our acknowledgement probably got ignored. Acknowledging again.\n", temp);
+				:: temp > last_received ->
+					printf("[R] Message #%d is a new message. Acknowledging.\n", temp);
+					printf("[R] [Payload] Receiver commits to payload \"%d\". Payload hash: %d -> %d\n", message, payloadHashReceived, payloadHashReceived * hashmod + message % hashmod);
+					payloadHashReceived = payloadHashReceived * hashmod + message % hashmod;
+					last_received = temp;
+				fi;
+				senderchan ! MSG_ACK, last_received, 0;
+				printf("[R] Sent MSG_ACK for message #%d\n", last_received);
+			:: true -> /* Possible timeout */
+				printf("[R] Receiver pretending we didn't see the message, waiting for retransmission.\n");
 			fi;
 			goto l_ESTABLISHED;
+		#ifdef MUTANT_RECEIVER_FIN_ACK_WRONG_GUARD
+		:: true ->
+			MUTANT_RECEIVER_FIN_ACK_WRONG_GUARD
+		#else
 		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->
+		#endif
 			printf("[R] Received FIN_ACK from sender\n");
 			#ifdef MUTANT_RECEIVER_DONT_CLOSE
 				MUTANT_RECEIVER_DONT_CLOSE
