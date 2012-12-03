@@ -3,10 +3,10 @@
 
 #include "../../tcp.pml"
 
-never  {    /* ![](receiverchan_ACK->X sender_ESTABLISHED) */
+never  {    /* ![](receiverchan_SYN_ACK->X sender_ESTABLISHED) */
 T0_init:
 	if
-	:: (receiverchan_ACK) -> goto accept_S0
+	:: (receiverchan_SYN_ACK) -> goto accept_S0
 	:: (1) -> goto T0_init
 	fi;
 accept_S0:
