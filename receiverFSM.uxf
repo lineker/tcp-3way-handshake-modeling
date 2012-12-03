@@ -117,14 +117,14 @@ true</panel_attributes>
   <element>
     <type>com.umlet.element.Relation</type>
     <coordinates>
-      <x>640</x>
+      <x>620</x>
       <y>350</y>
-      <w>278</w>
+      <w>314</w>
       <h>180</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-ACK with correct sequence number</panel_attributes>
-    <additional_attributes>140;160;140;30</additional_attributes>
+SYN_ACK with correct sequence number</panel_attributes>
+    <additional_attributes>160;160;160;30</additional_attributes>
   </element>
   <element>
     <type>com.umlet.element.Relation</type>
@@ -135,7 +135,7 @@ ACK with correct sequence number</panel_attributes>
       <h>70</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-ACK with incorrect sequence number/FIN_ACK</panel_attributes>
+SYN_ACK with incorrect sequence number/FIN_ACK</panel_attributes>
     <additional_attributes>30;50;380;50</additional_attributes>
   </element>
   <element>

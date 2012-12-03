@@ -56,9 +56,9 @@ active proctype Sender()
 #ifdef MUTANT_SENDER_WRONT_RECEIVERUID
 		MUTANT_SENDER_WRONT_RECEIVERUID
 #endif
-		printf("[S] Sending ACK\n");
+		printf("[S] Sending SYN+ACK\n");
 		atomic {
-			receiverchan ! ACK, senderuid, receiveruid;
+			receiverchan ! SYN_ACK, senderuid, receiveruid;
 			senderState = ESTABLISHED;
 		}
 	}

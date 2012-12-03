@@ -11,6 +11,7 @@
 /* Receiver input events */
 #define receiverchan_SYN     receiverchan?[SYN]
 #define receiverchan_ACK     receiverchan?[ACK]
+#define receiverchan_SYN_ACK receiverchan?[SYN_ACK]
 #define receiverchan_FIN_ACK receiverchan?[FIN_ACK]
 
 /* Receiver output events */
@@ -46,9 +47,9 @@ active proctype Receiver()
 	l_SYN_RCVD: {
 		atomic {
 			receiverState = SYN_RCVD;
-			receiverchan ? ACK, senderuid, temp;
+			receiverchan ? SYN_ACK, senderuid, temp;
 		}
-		printf("[R] Received ACK\n");
+		printf("[R] Received SYN+ACK\n");
 		if
 		:: temp != receiveruid + 1 ->
 			printf("[R] Sequence number (receiveruid) send by sender doesn't match the expected value! Closing.\n");
