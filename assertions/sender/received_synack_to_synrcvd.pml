@@ -1,4 +1,4 @@
-* received_synack_to_synrcvd.pml - Check if the sender moves to state SYN_RCVD when received SYN_ACK  */
+/* received_synack_to_synrcvd.pml - Check if the sender moves to state SYN_RCVD when received SYN_ACK  */
 
 #include "../../tcp.pml"
 

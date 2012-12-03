@@ -1,4 +1,4 @@
-* established_eventually_finwait.pml - Check if the sender eventually moves from state ESTABLISHED to state FIN_WAIT_1 properly */
+/* established_eventually_finwait.pml - Check if the sender eventually moves from state ESTABLISHED to state FIN_WAIT_1 properly */
 
 #include "../../tcp.pml"
 
