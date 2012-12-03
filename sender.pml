@@ -1,12 +1,12 @@
 /* sender.pml - Sender process */
 
 /* Sender states */
-#define sender_CLOSED      receiverState == CLOSED
-#define sender_SYN_SENT    receiverState == SYN_SENT
-#define sender_SYN_RCVD    receiverState == SYN_RCVD
-#define sender_ESTABLISHED receiverState == ESTABLISHED
-#define sender_FIN_WAIT_1  receiverState == FIN_WAIT_1
-#define sender_TERMINATED  receiverState == TERMINATED
+#define sender_CLOSED      senderState == CLOSED
+#define sender_SYN_SENT    senderState == SYN_SENT
+#define sender_SYN_RCVD    senderState == SYN_RCVD
+#define sender_ESTABLISHED senderState == ESTABLISHED
+#define sender_FIN_WAIT_1  senderState == FIN_WAIT_1
+#define sender_TERMINATED  senderState == TERMINATED
 
 active proctype Sender()
 {
