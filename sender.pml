@@ -100,9 +100,15 @@ active proctype Sender()
 	}
 
 	l_CLOSE: {
+
 		atomic {
 			receiverchan ! FIN_ACK, senderuid, receiveruid;
+#ifdef MUTANT_SENDER_FINACK_WRONG_STATE
+		MUTANT_SENDER_FINACK_WRONG_STATE
+#else
 			senderState = FIN_WAIT_1;
+			
+#endif
 		}
 		printf("[S] Sent FIN_ACK to receiver\n");
 	}

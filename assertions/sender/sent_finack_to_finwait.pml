@@ -11,7 +11,7 @@ T0_init:
 	fi;
 accept_S0:
 	if
-	:: (! sender_FIN_WAIT_1) -> goto accept_all
+	:: (! (senderState == FIN_WAIT_1)) -> goto accept_all
 	fi;
 accept_all:
 	skip
