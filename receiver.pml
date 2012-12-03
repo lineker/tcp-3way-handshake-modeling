@@ -34,9 +34,9 @@ active proctype Receiver()
 		atomic {
 			receiverchan ? SYN, senderuid, temp; /* Wait for SYN */
 			printf("[R] Received SYN\n");
-			#ifdef MUTANT_RECEIVER_SEND_INVALID_MSG_ACK
-				MUTANT_RECEIVER_SEND_INVALID_MSG_ACK
-			#endif
+#ifdef MUTANT_RECEIVER_SEND_INVALID_MSG_ACK
+			MUTANT_RECEIVER_SEND_INVALID_MSG_ACK
+#endif
 			receiveruid = receiveruid + 1; /* increment sequence number */
 			senderchan ! SYN_ACK, receiveruid, senderuid + 1; /* Send back SYN+ACK */
 			printf("[R] Sent SYN+ACK\n");
@@ -62,9 +62,9 @@ active proctype Receiver()
 		receiverState = ESTABLISHED;
 		do
 		:: messagechan ? temp, message -> /* Receive a message */
-			#ifdef MUTANT_RECEIVER_CORRUPT_PAYLOAD
-				MUTANT_RECEIVER_CORRUPT_PAYLOAD
-			#endif
+#ifdef MUTANT_RECEIVER_CORRUPT_PAYLOAD
+			MUTANT_RECEIVER_CORRUPT_PAYLOAD
+#endif
 			printf("[R] Message #%d received with payload \"%d\"\n", temp, message);
 			if
 			:: temp < last_received ->
@@ -85,16 +85,16 @@ active proctype Receiver()
 				printf("[R] Receiver pretending we didn't see the message, waiting for retransmission.\n");
 			fi;
 			goto l_ESTABLISHED;
-		#ifdef MUTANT_RECEIVER_FIN_ACK_WRONG_GUARD
+#ifdef MUTANT_RECEIVER_FIN_ACK_WRONG_GUARD
 		:: true ->
 			MUTANT_RECEIVER_FIN_ACK_WRONG_GUARD
-		#else
+#else
 		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->
-		#endif
+#endif
 			printf("[R] Received FIN_ACK from sender\n");
-			#ifdef MUTANT_RECEIVER_DONT_CLOSE
-				MUTANT_RECEIVER_DONT_CLOSE
-			#endif
+#ifdef MUTANT_RECEIVER_DONT_CLOSE
+			MUTANT_RECEIVER_DONT_CLOSE
+#endif
 			goto l_CLOSE_WAIT;  /* change state because we received a FIN */
 		od;
 	}
@@ -115,11 +115,11 @@ active proctype Receiver()
 	}
 
 	l_LAST_ACK: {
-		#ifdef MUTANT_RECEIVER_SET_WRONG_STATE
-			MUTANT_RECEIVER_SET_WRONG_STATE
-		#else
-			receiverState = LAST_ACK;
-		#endif
+#ifdef MUTANT_RECEIVER_SET_WRONG_STATE
+		MUTANT_RECEIVER_SET_WRONG_STATE
+#else
+		receiverState = LAST_ACK;
+#endif
 		printf("[R] --- Receiver closed ---\n");
 		do /* Flush receiver channel */
 		:: receiverchan ? _, _, _;
