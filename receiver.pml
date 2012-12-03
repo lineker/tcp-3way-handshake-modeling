@@ -59,6 +59,9 @@ active proctype Receiver()
 		receiverState = ESTABLISHED;
 		do
 		:: messagechan ? temp, message -> /* Receive a message */
+			#ifdef MUTANT_RECEIVER_CORRUPT_PAYLOAD
+				MUTANT_RECEIVER_CORRUPT_PAYLOAD
+			#endif
 			printf("[R] Message #%d received with payload \"%d\"\n", temp, message);
 			if
 			:: temp < last_received ->
