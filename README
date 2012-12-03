@@ -1,0 +1,9 @@
+Software Validation and Verification
+
+Three Way Handshake for TCP Connection
+
+Usage:
+
+./modelcheck.sh
+./checkassertions.sh
+./checkmutants.sh
