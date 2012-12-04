@@ -93,6 +93,9 @@ active proctype Receiver()
 #else
 		:: receiverchan ? FIN_ACK, senderuid, receiveruid ->
 #endif
+#ifdef IMM_RECEIVER_FIN_ACK_CHANNEL_EMPTY
+			IMM_RECEIVER_FIN_ACK_CHANNEL_EMPTY
+#endif
 			printf("[R] Received FIN_ACK from sender\n");
 #ifdef MUTANT_RECEIVER_DONT_CLOSE
 			MUTANT_RECEIVER_DONT_CLOSE
