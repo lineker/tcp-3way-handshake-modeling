@@ -53,8 +53,12 @@ active proctype Sender()
 		fi;
 		senderuid = temp;
 		receiveruid = receiveruid + 1;
+		temp = receiveruid;
 #ifdef MUTANT_SENDER_WRONG_RECEIVERUID
 		MUTANT_SENDER_WRONG_RECEIVERUID
+#endif
+#ifdef IMM_SENDER_WRONG_RECEIVERUID
+		IMM_SENDER_WRONG_RECEIVERUID
 #endif
 		printf("[S] Sending SYN+ACK\n");
 		atomic {
