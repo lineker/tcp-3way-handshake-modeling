@@ -14,9 +14,9 @@ active proctype Sender()
 	int senderuid = 0, receiveruid, message = 1, temp, totalconnections = 0, nummessages;
 
 	/* TCP three way handshake starts here */
-	senderState = CLOSED; /*initial state*/
 	l_CLOSED: {
-		(receiverState == LISTEN);/* wait for recevier channel to be ready */
+		senderState = CLOSED; /* Initial state */
+		(receiverState == LISTEN);/* Wait for recevier channel to be ready */
 		nummessages = 0; /* We have sent 0 messages so far */
 		do /* Flush sender channel */
 		:: senderchan ? _, _, _;
@@ -125,7 +125,6 @@ active proctype Sender()
 	l_FIN_WAIT: {
 		atomic {
 			receiverchan ! ACK, senderuid, receiveruid;
-			senderState = CLOSED;
 			printf("[S] --- Sender closed ---\n");
 			if
 			:: totalconnections < connections ->
