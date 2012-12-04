@@ -45,7 +45,7 @@ active proctype Sender()
 #ifdef MUTANT_SENDER_WRONG_SENDERUID
 		MUTANT_SENDER_WRONG_SENDERUID
 #endif
-		if 
+		if
 		:: temp != senderuid + 1 ->
 			printf("[S] senderuid sent by receiver doesn't match the expected value! Resetting state.\n");
 			goto l_CLOSE;

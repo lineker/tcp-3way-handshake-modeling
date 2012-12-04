@@ -7,6 +7,7 @@
 #define receiver_ESTABLISHED receiverState == ESTABLISHED
 #define receiver_CLOSE_WAIT  receiverState == CLOSE_WAIT
 #define receiver_LAST_ACK    receiverState == LAST_ACK
+#define receiver_TERMINATED  receiverState == TERMINATED
 
 /* Receiver input events */
 #define receiverchan_SYN     receiverchan?[SYN]
