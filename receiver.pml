@@ -122,11 +122,6 @@ active proctype Receiver()
 		receiverState = LAST_ACK;
 #endif
 		printf("[R] --- Receiver closed ---\n");
-		do /* Flush receiver channel */
-		:: receiverchan ? _, _, _;
-		:: empty(receiverchan) -> break;
-		od;
-		printf("[R] --- Receiver flushed ---\n");
 		if
 		:: receiver_totalconnections < connections ->
 			receiver_totalconnections = receiver_totalconnections + 1;
