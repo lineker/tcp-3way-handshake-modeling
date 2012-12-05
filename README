@@ -1,9 +1,23 @@
 Software Validation and Verification
 
-Three Way Handshake for TCP Connection
+Validation and Verification of TCP
 
-Usage:
+Full report is stored as Tomazeli_and_Perot_final_project_2012.pdf
 
-./modelcheck.sh
-./checkassertions.sh
-./checkmutants.sh
+Script usage information:
+
+modelcheck.sh:
+  Runs spin’s model checker over a file given as argument. If no argument is
+  given, runs the model checker over tcp.pml.
+
+checkassertions.sh:
+  Runs spin’s model checker over a given assertion .pml file, or a directory
+  containing assertions given as argument. If no arguments is given, runs the
+  model checker over all assertions in the assertions folder.
+
+checkmutant.sh:
+  Iterates over all mutants in the mutants directory. For each mutant .pml
+  file, check it against each assertion .pml file in the assertions directory.
+  Whenever one assertion catches the mutant, move on to the next mutant. If a
+  mutant .pml file is given as argument, restricts the search that single
+  mutant file.
